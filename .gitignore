@@ -1,0 +1,9 @@
+.venv/
+__pycache__/
+extracted/
+.ipynb_checkpoints/
+*.pyc
+
+# Generated artefacts - rebuild with src/run_pipeline.py and tools/run_notebooks.py
+clean/
+figures/
