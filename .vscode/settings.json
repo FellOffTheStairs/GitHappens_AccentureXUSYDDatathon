@@ -1,0 +1,23 @@
+{
+  // Interpreter: the project venv. Notebooks pick this up as the default kernel.
+  "python.defaultInterpreterPath": "${workspaceFolder}\\.venv\\Scripts\\python.exe",
+  "python.terminal.activateEnvironment": true,
+
+  // Run each notebook with its own folder as the working directory, so the
+  // relative paths in src/nbinit.py resolve the same way every time.
+  "jupyter.notebookFileRoot": "${fileDirname}",
+
+  // src/ on the path for editor intellisense (mirrors what nbinit.py does at runtime)
+  "python.analysis.extraPaths": ["${workspaceFolder}/src"],
+  "python.autoComplete.extraPaths": ["${workspaceFolder}/src"],
+
+  // Keep notebook diffs reviewable: strip outputs and execution counts on save.
+  "notebook.output.textLineLimit": 40,
+  "notebook.lineNumbers": "on",
+  "notebook.formatOnSave.enabled": false,
+
+  "files.exclude": {
+    "**/__pycache__": true,
+    "**/.ipynb_checkpoints": true
+  }
+}
