@@ -340,5 +340,4 @@ python tools\run_notebooks.py                             # run all six notebook
 start dashboard\index.html                                # open the dashboard
 ```
 
-Every figure in the deck traces to a notebook section. The mapping is in
-appendix A1 of the deck and in `FUNCTIONS.md`.
+The figure mappings are in appendix A1 of the accompanying CHRO deck.
