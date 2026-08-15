@@ -20,6 +20,12 @@ import pandas as pd
 OBS_START = pd.Timestamp("2024-01-01")
 OBS_END = pd.Timestamp("2025-12-31")
 
+# The window is 24 months. Finance's cost ranges are stated per year, so any
+# count of events (exits, hires) has to be divided by this before the two are
+# compared. Counts of people in a state (currently disengaged) are already
+# annual and must not be divided.
+OBS_YEARS = 2.0
+
 # Finance benchmark constants (case brief, section 6)
 REPLACEMENT_MULTIPLIER = 1.5      # x annual base salary
 BACKFILL_RATE = 0.85              # share of vacated positions refilled

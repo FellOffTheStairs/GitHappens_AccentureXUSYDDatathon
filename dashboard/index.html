@@ -2,27 +2,50 @@
 
 <style>
 /* ─────────────────────────────────────────────────────────────
-   Tokens. Light palette is complete on bare :root.
-   Series hues are the same slots as src/nbinit.py, so a colour
-   means the same thing here as it does on the deck figures.
-   Validated: light #2a78d6/#eb6834/#1baf7a on #fcfcfb,
-              dark  #4589e0/#e07038/#1faa7e on #1c1b19.
+   Tokens.
+
+   Four hues carry every meaning on the page:
+     accent  blue    reference / published / identified
+     counter orange  observed / the value that differs
+     flag    amber   partial confidence / a floor / caution
+     stop    red     do not do this / not identified
+
+   Each has a -ink variant for small text (4.5:1 on the card
+   surface) and the fills clear 3:1. Everything else is the
+   neutral scale. Adding a fifth hue means one of these has
+   stopped carrying its meaning; fix that instead.
+
+   Series hues match src/nbinit.py, so a colour means the same
+   thing here as on the deck figures.
    ───────────────────────────────────────────────────────────── */
 :root {
+  /* surfaces and ink */
   --paper:      #f4f3ee;
   --card:       #fcfcfb;
+  --sunk:       #f7f6f1;
   --ink:        #0b0b0b;
   --ink-2:      #52514e;
-  --ink-3:      #898781;
+  --ink-3:      #86847e;
   --rule:       #e1e0d9;
   --rule-soft:  #edece6;
-  --accent:     #2a78d6;
-  --counter:    #eb6834;
-  --good:       #0ca30c;
-  --warn:       #fab219;
-  --crit:       #d03b3b;
-  --stamp-bg:   #fbfaf6;
-  --shadow:     0 1px 2px rgba(11,11,11,.05), 0 8px 24px -16px rgba(11,11,11,.28);
+
+  /* four hues: fill, then ink for small text */
+  --accent:      #2a78d6;
+  --accent-ink:  #1f5fae;
+  --accent-wash: #e8f0fc;
+  --counter:     #e2683a;
+  --counter-ink: #a8460f;
+  --flag:        #c98a10;
+  --flag-ink:    #8a5600;
+  --stop:        #d03b3b;
+  --stop-ink:    #b02525;
+
+  --shadow: 0 1px 2px rgba(11,11,11,.05), 0 8px 24px -16px rgba(11,11,11,.28);
+
+  /* spacing scale, 4px base */
+  --s1: 4px;  --s2: 8px;  --s3: 12px; --s4: 16px;
+  --s5: 22px; --s6: 30px; --s7: 40px;
+  --radius: 4px;
 
   --sans: "Segoe UI", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
   --serif: Georgia, "Iowan Old Style", "Palatino Linotype", "Times New Roman", serif;
@@ -32,35 +55,47 @@
   :root:not([data-theme="light"]) {
     --paper:      #121110;
     --card:       #1c1b19;
+    --sunk:       #201e1b;
     --ink:        #f2f1ec;
     --ink-2:      #b0aea8;
     --ink-3:      #86847e;
     --rule:       #302e2a;
     --rule-soft:  #26241f;
-    --accent:     #4589e0;
-    --counter:    #e07038;
-    --good:       #35b535;
-    --warn:       #d9a020;
-    --crit:       #e05a5a;
-    --stamp-bg:   #201e1b;
-    --shadow:     0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.8);
+  
+    --accent:      #5b9df0;
+    --accent-ink:  #8bbaf5;
+    --accent-wash: #1d2b3d;
+    --counter:     #f0824f;
+    --counter-ink: #f5a077;
+    --flag:        #e0a53c;
+    --flag-ink:    #ecc274;
+    --stop:        #f06a6a;
+    --stop-ink:    #f59191;
+  
+    --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.8);
   }
 }
 :root[data-theme="dark"] {
   --paper:      #121110;
   --card:       #1c1b19;
+  --sunk:       #201e1b;
   --ink:        #f2f1ec;
   --ink-2:      #b0aea8;
   --ink-3:      #86847e;
   --rule:       #302e2a;
   --rule-soft:  #26241f;
-  --accent:     #4589e0;
-  --counter:    #e07038;
-  --good:       #35b535;
-  --warn:       #d9a020;
-  --crit:       #e05a5a;
-  --stamp-bg:   #201e1b;
-  --shadow:     0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.8);
+
+  --accent:      #5b9df0;
+  --accent-ink:  #8bbaf5;
+  --accent-wash: #1d2b3d;
+  --counter:     #f0824f;
+  --counter-ink: #f5a077;
+  --flag:        #e0a53c;
+  --flag-ink:    #ecc274;
+  --stop:        #f06a6a;
+  --stop-ink:    #f59191;
+
+  --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.8);
 }
 
 * { box-sizing: border-box; }
@@ -125,12 +160,12 @@ nav.tabs { display: flex; flex-direction: column; gap: 1px; }
 .tab:hover { color: var(--ink-2); border-left-color: var(--ink-3); }
 .tab[aria-selected="true"] {
   color: var(--ink); font-weight: 600;
-  border-left-color: var(--accent); background: var(--stamp-bg);
+  border-left-color: var(--accent); background: var(--sunk);
 }
 .tab[aria-selected="true"] .ref { color: var(--accent); opacity: 1; }
 .tab:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
 
-/* Standing caveat — true on every screen, so it lives in the chrome */
+/* Standing caveat, true on every screen, so it lives in the chrome */
 .sb-caveat {
   margin-top: auto; padding-top: 16px; border-top: 1px solid var(--rule);
   font-size: 11.5px; line-height: 1.55; color: var(--ink-2);
@@ -139,8 +174,8 @@ nav.tabs { display: flex; flex-direction: column; gap: 1px; }
 .caveat-tag {
   display: block; width: fit-content; margin-bottom: 9px;
   font-family: var(--mono); font-size: 9.5px; letter-spacing: .09em;
-  text-transform: uppercase; color: var(--warn); white-space: nowrap;
-  border: 1px solid var(--warn); border-radius: 2px; padding: 1px 5px;
+  text-transform: uppercase; color: var(--flag-ink); white-space: nowrap;
+  border: 1px solid var(--flag-ink); border-radius: 2px; padding: 1px 5px;
 }
 
 @media (max-width: 900px) {
@@ -191,7 +226,7 @@ main { max-width: 1120px; margin: 0 auto; padding: 30px 30px 80px; }
 .verdict p + p { margin-top: 12px; }
 .verdict strong { color: var(--ink); font-weight: 700; }
 
-/* Confidence stamp — what you are allowed to claim */
+/* Confidence stamp, what you are allowed to claim */
 .stamp {
   display: inline-flex; align-items: center; gap: 7px;
   font-family: var(--mono); font-size: 10.5px; letter-spacing: .1em;
@@ -202,13 +237,13 @@ main { max-width: 1120px; margin: 0 auto; padding: 30px 30px 80px; }
   content: ""; width: 6px; height: 6px; border-radius: 50%;
   background: currentColor;
 }
-.stamp.is-solid  { color: var(--good); }
-.stamp.is-floor  { color: var(--warn); }
-.stamp.is-none   { color: var(--crit); }
+.stamp.is-solid { color: var(--accent-ink); background: var(--accent-wash); }
+.stamp.is-floor { color: var(--flag-ink); }
+.stamp.is-none { color: var(--stop-ink); }
 
 /* ── KPI row ──────────────────────────────────────────────── */
 /* Every screen carries exactly four, so the columns are fixed rather than
-   auto-fit — an auto-fit row leaves a half-empty cell at some widths. */
+   auto-fit, an auto-fit row leaves a half-empty cell at some widths. */
 .kpis {
   display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 1px; background: var(--rule); border: 1px solid var(--rule);
@@ -265,7 +300,7 @@ main { max-width: 1120px; margin: 0 auto; padding: 30px 30px 80px; }
   height: 13px; border-radius: 0 3px 3px 0; min-width: 2px;
   transition: opacity .15s;
 }
-.bar-fill.pub  { background: var(--accent); }
+.bar-fill.pub { background: var(--accent); }
 .bar-fill.obs  { background: var(--counter); }
 .bar-fill.solo { background: var(--accent); }
 .bar-fill.mute { background: var(--ink-3); opacity: .42; }
@@ -306,7 +341,7 @@ thead th {
 tbody td { font-variant-numeric: tabular-nums; color: var(--ink-2); }
 tbody td:first-child { color: var(--ink); }
 tbody tr:last-child td { border-bottom: 0; }
-tr.is-highlight td { background: var(--stamp-bg); }
+tr.is-highlight td { background: var(--sunk); }
 tr.is-highlight td:first-child { font-weight: 650; color: var(--ink); }
 td .flag {
   font-family: var(--mono); font-size: 10px; letter-spacing: .06em;
@@ -335,8 +370,8 @@ td .flag {
   border-left: 2px solid var(--rule); padding: 2px 0 2px 16px;
   margin: 0; font-size: 13.5px; color: var(--ink-2); line-height: 1.6;
 }
-.callout.is-warn { border-left-color: var(--warn); }
-.callout.is-crit { border-left-color: var(--crit); }
+.callout.is-warn { border-left-color: var(--flag-ink); }
+.callout.is-crit { border-left-color: var(--stop-ink); }
 .callout b { color: var(--ink); font-weight: 650; }
 .callout + .callout { margin-top: 15px; }
 
@@ -362,7 +397,7 @@ td .flag {
 }
 @media (max-width: 720px) { .rec { grid-template-columns: 1fr; } }
 .rec + .rec { margin-top: 14px; }
-.rec.is-dont { border-left: 2px solid var(--crit); }
+.rec.is-dont { border-left: 2px solid var(--stop-ink); }
 .rec-head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 9px; flex-wrap: wrap; }
 .rec-rank {
   font-family: var(--mono); font-size: 11px; letter-spacing: .08em;
@@ -389,21 +424,226 @@ td .flag {
   text-transform: uppercase; color: var(--ink-3);
 }
 .meta-value { font-size: 13.5px; color: var(--ink); font-weight: 600; }
-.meta-value.good { color: var(--good); }
-.meta-value.warn { color: var(--warn); }
-.meta-value.crit { color: var(--crit); }
+.meta-value.good { color: var(--accent-ink); }
+.meta-value.warn { color: var(--flag-ink); }
+.meta-value.crit { color: var(--stop-ink); }
 
-.provenance {
-  margin-top: 46px; padding-top: 20px; border-top: 1px solid var(--rule);
-  font-family: var(--mono); font-size: 11.5px; color: var(--ink-3);
-  line-height: 1.75;
-}
-.provenance b { color: var(--ink-2); font-weight: 400; }
 
 .sr-only {
   position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
   overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
 }
+
+/* ── Refinements ──────────────────────────────────────────── */
+
+/* Verdict runs as two columns on a wide screen: the claim on the left, the
+   reasoning on the right. One column below 1080px. Without this the headline
+   is capped at 20ch and leaves half the row empty. */
+@media (min-width: 1080px) {
+  .verdict {
+    display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+    grid-template-rows: auto auto 1fr;
+    column-gap: var(--s7); align-items: start;
+  }
+  .verdict > .eyebrow { grid-column: 1; grid-row: 1; }
+  .verdict > .stamp   { grid-column: 1; grid-row: 2; }
+  .verdict > h2       { grid-column: 1; grid-row: 3; align-self: start;
+                        margin-bottom: 0; max-width: none; }
+  .verdict-body       { grid-column: 2; grid-row: 1 / -1; }
+}
+.verdict-body p { max-width: 62ch; }
+
+/* Recommendation body fills its column rather than stopping at 62ch and
+   leaving a gap before the meta rail. */
+.rec p { max-width: none; }
+
+/* Large numerals sit on the fill hue; small text uses the -ink variant so it
+   clears 4.5:1 against the card. */
+.kpi-value.accent  { color: var(--accent); }
+.kpi-value.counter { color: var(--counter-ink); }
+.card, .rec, .kpis { border-radius: var(--radius); }
+.legend { gap: var(--s4); row-gap: var(--s2); }
+.swatch { border-radius: var(--s1); }
+
+/* Verdict gets a coloured rule so the confidence grade is legible from the
+   scroll position, not just from the stamp text. */
+.verdict { border-left: 3px solid var(--rule); padding-left: var(--s5); }
+.verdict:has(.is-solid) { border-left-color: var(--accent); }
+.verdict:has(.is-floor) { border-left-color: var(--flag); }
+.verdict:has(.is-none)  { border-left-color: var(--stop); }
+
+.stamp { background: var(--sunk); border-color: currentColor; }
+
+/* KPI: the first cell of each row is the reference figure, so tint it. */
+.kpi { transition: background .15s; }
+.kpi:hover { background: var(--sunk); }
+.kpi-value { font-variant-numeric: tabular-nums; }
+
+/* Cards lift slightly on hover so the grid reads as separable objects. */
+.card { transition: border-color .15s, transform .15s; }
+.card:hover { border-color: var(--ink-3); }
+
+/* Bars: rounded on both ends, and a track behind them so short bars still
+   show their scale. */
+.bar-fill { border-radius: 2px; }
+.bar-fill.pub { background: var(--accent); }
+.bar-fill.obs { background: var(--counter); }
+.bar-fill.solo { background: var(--accent); }
+.bar-fill.mute { background: var(--ink-3); opacity: .38; }
+.stack .seg-both { background: var(--accent); }
+.stack .seg-missed { background: var(--counter); }
+.stack .seg-only { background: var(--ink-3); opacity: .38; }
+.sw-pub { background: var(--accent); }
+.sw-obs { background: var(--counter); }
+
+/* Callouts inherit the same four meanings. */
+.callout.is-warn { border-left-color: var(--flag); }
+.callout.is-crit { border-left-color: var(--stop); }
+.rec.is-dont { border-left-color: var(--stop); }
+.caveat-tag { color: var(--flag-ink); border-color: var(--flag); }
+
+/* Sidebar active row reads as a selected tab, not a hover. */
+.tab[aria-selected="true"] { background: var(--accent-wash); }
+
+/* Visible focus everywhere, for keyboard and for a live demo on a big screen. */
+a:focus-visible, button:focus-visible {
+  outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 2px;
+}
+
+/* Print: flatten to light, show every screen, drop the chrome. Useful for
+   dropping a screen into the appendix as a PDF page. */
+@media print {
+  :root, :root[data-theme="dark"] {
+    --paper: #fff; --card: #fff; --sunk: #f6f6f4;
+    --ink: #000; --ink-2: #333; --ink-3: #666;
+    --rule: #ccc; --rule-soft: #e4e4e0; --shadow: none;
+    --accent: #1f5fae; --accent-ink: #1f5fae; --accent-wash: #eef3fb;
+    --counter: #a8460f; --counter-ink: #a8460f;
+    --flag: #8a5600; --flag-ink: #8a5600;
+    --stop: #b02525; --stop-ink: #b02525;
+  }
+  .sidebar, .theme-toggle { display: none; }
+  .shell, .content { display: block; max-width: none; padding: 0; }
+  .screen[hidden] { display: block !important; }
+  .screen { break-before: page; }
+  .card, .rec { break-inside: avoid; box-shadow: none; }
+}
+
+
+/* ── Round 3 components ───────────────────────────────────── */
+
+/* Heat tint on a numeric table. One hue, opacity carries magnitude, and the
+   number stays readable because the tint sits behind it. */
+td.heat { position: relative; }
+td.heat::before {
+  content: ""; position: absolute; inset: 2px; border-radius: 2px;
+  background: var(--counter); opacity: calc(var(--v) * 0.42); z-index: 0;
+}
+td.heat > span { position: relative; z-index: 1; }
+
+/* Small multiples: one mini bar per channel, shared scale, direct labels. */
+.multiples {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(126px, 1fr));
+  gap: 1px; background: var(--rule); border: 1px solid var(--rule);
+  border-radius: var(--radius); overflow: hidden;
+}
+.mult { background: var(--card); padding: var(--s3) var(--s4) var(--s4); }
+.mult-name {
+  font-size: 11.5px; color: var(--ink-3); text-transform: uppercase;
+  letter-spacing: .05em; margin-bottom: var(--s2);
+}
+.mult-row { display: flex; align-items: center; gap: var(--s2); margin-bottom: 5px; }
+.mult-bar { height: 9px; border-radius: 2px; background: var(--ink-3); opacity: .4; }
+.mult-bar.is-focus { background: var(--counter); opacity: 1; }
+.mult-val {
+  font-size: 11.5px; color: var(--ink-2); font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.mult.is-focus { background: var(--sunk); }
+.mult.is-focus .mult-name { color: var(--counter-ink); }
+
+/* Allocation bar: one row, segments sized by share, labels underneath. */
+.alloc { display: flex; height: 34px; gap: 2px; margin-bottom: var(--s3); }
+.alloc span {
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 600; color: #fff; border-radius: 2px;
+}
+.alloc-key { display: flex; flex-wrap: wrap; gap: var(--s4); font-size: 12.5px; }
+.alloc-key span { display: inline-flex; align-items: center; gap: 7px; color: var(--ink-2); }
+
+
+/* ── Round 4 components ───────────────────────────────────── */
+
+/* Paired claim: what the evidence supports, and what it does not. The two
+   sit side by side so the narrowing is read at the same time as the effect. */
+.claim-pair { display: grid; gap: 1px; background: var(--rule);
+  border: 1px solid var(--rule); border-radius: var(--radius); overflow: hidden; }
+@media (min-width: 700px) { .claim-pair { grid-template-columns: 1fr 1fr; } }
+.claim { background: var(--card); padding: var(--s4) var(--s5) var(--s5); }
+.claim-tag {
+  font-family: var(--mono); font-size: 10.5px; letter-spacing: .09em;
+  text-transform: uppercase; margin-bottom: var(--s2);
+}
+.claim.is-yes .claim-tag { color: var(--accent-ink); }
+.claim.is-no  .claim-tag { color: var(--flag-ink); }
+.claim.is-no { background: var(--sunk); }
+.claim p { margin: 0; font-size: 13.5px; line-height: 1.6; color: var(--ink-2); }
+.claim p + p { margin-top: var(--s2); }
+.claim b { color: var(--ink); }
+
+/* Reconciliation ledger: a formula shown as its parts. */
+.ledger { font-family: var(--mono); font-size: 13px; }
+.ledger div {
+  display: flex; justify-content: space-between; gap: var(--s4);
+  padding: 7px 0; border-bottom: 1px solid var(--rule-soft);
+}
+.ledger div:last-child { border-bottom: 0; border-top: 1px solid var(--rule); font-weight: 600; }
+.ledger .lbl { color: var(--ink-2); }
+.ledger .val { color: var(--ink); font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+/* Decision sequence: rows of interventions against a shared timeline. */
+.seq { display: flex; flex-direction: column; gap: 1px;
+  background: var(--rule); border: 1px solid var(--rule);
+  border-radius: var(--radius); overflow: hidden; }
+.seq-head, .seq-row {
+  display: grid; grid-template-columns: minmax(150px, 1.5fr) 3fr minmax(96px, .9fr);
+  gap: var(--s4); background: var(--card); padding: var(--s3) var(--s4); align-items: center;
+}
+.seq-head { background: var(--sunk); }
+.seq-head span {
+  font-family: var(--mono); font-size: 10px; letter-spacing: .09em;
+  text-transform: uppercase; color: var(--ink-3);
+}
+.seq-name { font-size: 13.5px; color: var(--ink); font-weight: 600; line-height: 1.3; }
+.seq-name small { display: block; font-weight: 400; color: var(--ink-3); font-size: 11.5px; }
+.seq-track { position: relative; height: 30px; }
+.seq-track::before {
+  content: ""; position: absolute; left: 0; right: 0; top: 14px;
+  height: 1px; background: var(--rule);
+}
+.seq-bar {
+  position: absolute; top: 9px; height: 11px; border-radius: 2px;
+}
+.seq-dot {
+  position: absolute; top: 7px; width: 15px; height: 15px; border-radius: 50%;
+  border: 2px solid var(--card); transform: translateX(-50%);
+}
+.seq-when {
+  position: absolute; top: 24px; font-size: 10.5px; color: var(--ink-3);
+  transform: translateX(-50%); white-space: nowrap;
+}
+.seq-val { font-size: 13px; color: var(--ink-2); text-align: right;
+  font-variant-numeric: tabular-nums; }
+.seq-val b { display: block; color: var(--ink); font-size: 14px; }
+.seq-scale {
+  display: grid; grid-template-columns: minmax(150px, 1.5fr) 3fr minmax(96px, .9fr);
+  gap: var(--s4); padding: 6px var(--s4) 0;
+  font-family: var(--mono); font-size: 10px; color: var(--ink-3);
+  letter-spacing: .06em;
+}
+.seq-scale-inner { position: relative; height: 14px; }
+.seq-scale-inner span { position: absolute; transform: translateX(-50%); }
+
 </style>
 
 <div class="shell">
@@ -438,10 +678,12 @@ td .flag {
 
   <div class="verdict">
     <div class="eyebrow">Workpaper A1 · cost reconciliation</div>
-    <span class="stamp is-floor">Bounded below — a floor, not an estimate</span>
-    <h2>The $42M is not the problem. It is the part Finance can already see.</h2>
-    <p>Apply <strong>Finance's own unit costs</strong> — unchanged, straight from the brief — to the population actually present in the data, and the figure lands at <strong>$143.7M</strong>. Nothing was re-derived and no new assumption was introduced. The gap is entirely a headcount question: Finance costed roughly the right number of regrettable exits and roughly a fifth of the disengaged and agency-hired staff who are sitting in the file.</p>
-    <p>And it is a floor twice over. The attrition log accounts for 60% of the departures the annual report claims for FY2025, so the exits driving the largest component are undercounted before the arithmetic starts.</p>
+    <span class="stamp is-floor">Bounded below, a floor, not an estimate</span>
+    <h2>The $42M is not too small. It is pointed at the wrong component.</h2>
+    <div class="verdict-body">
+      <p>Apply <strong>Finance's own unit costs</strong>, unchanged, to the population actually present in the data, and the figure lands at <strong>$76.7M</strong>. Nothing was re-derived and no new assumption was introduced. But the shape matters more than the total: two of the three components come in <strong>below</strong> Finance's range. The entire gap is disengagement.</p>
+    <p>And the attrition side is a floor. The log accounts for 60% of the departures the annual report claims for FY2025, so the regrettable component is undercounted before the arithmetic starts. Disengagement is not affected by that gap.</p>
+    </div>
   </div>
 
   <div class="kpis">
@@ -452,13 +694,13 @@ td .flag {
     </div>
     <div class="kpi">
       <div class="kpi-label">Same unit costs, observed population</div>
-      <div class="kpi-value counter">$143.7M</div>
-      <div class="kpi-note">3.4× the published midpoint</div>
+      <div class="kpi-value counter">$76.7M</div>
+      <div class="kpi-note">1.8× the published midpoint</div>
     </div>
     <div class="kpi">
       <div class="kpi-label">Unexplained gap</div>
-      <div class="kpi-value">+$101.7M</div>
-      <div class="kpi-note">headcount, not unit cost</div>
+      <div class="kpi-value">+$34.7M</div>
+      <div class="kpi-note">all of it disengagement</div>
     </div>
     <div class="kpi">
       <div class="kpi-label">Regrettable exits HR's flag catches</div>
@@ -469,41 +711,41 @@ td .flag {
 
   <div class="grid two">
     <div class="card">
-      <h3>Where the $101.7M sits</h3>
-      <p class="sub">Finance's published range against the same unit cost applied to every employee in the file who meets the definition. One component reconciles; two do not.</p>
+      <h3>Where the $34.7M sits</h3>
+      <p class="sub">Finance's published range against the same unit cost applied to the observed population, on an annual basis. Exits and hires are counted inside the 24-month window and halved; the disengaged count is a stock and is not.</p>
       <div class="legend">
         <span><i class="swatch sw-pub"></i> Finance published (high end of range)</span>
         <span><i class="swatch sw-obs"></i> Observed population</span>
       </div>
       <div class="bars">
         <div class="bar-row">
-          <div class="bar-name">Regrettable attrition<small>153 exits · $163,200 each</small></div>
+          <div class="bar-name">Regrettable attrition<small>77 exits a year · $163,200 each</small></div>
           <div class="bar-pair">
             <div class="bar-line"><div class="bar-fill pub" style="width:38.5%"></div><span class="bar-val">$25.0M</span></div>
-            <div class="bar-line"><div class="bar-fill obs" style="width:38.5%"></div><span class="bar-val"><b>$25.0M</b> · 1.0×</span></div>
+            <div class="bar-line"><div class="bar-fill obs" style="width:19.2%"></div><span class="bar-val"><b>$12.5M</b> · 0.5×</span></div>
           </div>
         </div>
         <div class="bar-row">
-          <div class="bar-name">Disengagement<small>3,219 staff · $19,200 each</small></div>
+          <div class="bar-name">Disengagement<small>3,219 staff · $19,200 each · a stock</small></div>
           <div class="bar-pair">
             <div class="bar-line"><div class="bar-fill pub" style="width:23.1%"></div><span class="bar-val">$15.0M</span></div>
             <div class="bar-line"><div class="bar-fill obs" style="width:95.1%"></div><span class="bar-val"><b>$61.8M</b> · 4.1×</span></div>
           </div>
         </div>
         <div class="bar-row">
-          <div class="bar-name">Hiring inefficiency<small>3,243 agency hires · $17,540 each</small></div>
+          <div class="bar-name">Hiring inefficiency<small>137 agency hires a year · $17,540 each</small></div>
           <div class="bar-pair">
             <div class="bar-line"><div class="bar-fill pub" style="width:9.2%"></div><span class="bar-val">$6.0M</span></div>
-            <div class="bar-line"><div class="bar-fill obs" style="width:87.5%"></div><span class="bar-val"><b>$56.9M</b> · 9.5×</span></div>
+            <div class="bar-line"><div class="bar-fill obs" style="width:3.7%"></div><span class="bar-val"><b>$2.4M</b> · 0.4×</span></div>
           </div>
         </div>
       </div>
-      <p class="footnote"><b>Read it as a scoping error, not a pricing error.</b> Finance's unit costs are accepted in full. What the published figure implies is a disengaged population of 625–781 people against 3,219 in the file, and 228–342 agency hires against 3,243.</p>
+      <p class="footnote"><b>Read it as a misallocation, not an underestimate.</b> Finance's unit costs are accepted in full. The published figure implies a disengaged population of 625–781 people; the file holds 3,219. On the other two components Finance's assumptions are more generous than the data supports.</p>
     </div>
 
     <div class="card">
       <h3>HR's regrettable flag misses four in five</h3>
-      <p class="sub">An evidence test — voluntary exit by someone carrying a high-potential flag or a top-two performance rating — identifies 496 people. HR's retrospective flag identifies 153, of which 101 overlap.</p>
+      <p class="sub">An evidence test, voluntary exit by someone carrying a high-potential flag or a top-two performance rating, identifies 496 people. HR's retrospective flag identifies 153, of which 101 overlap.</p>
       <div class="legend">
         <span><i class="swatch sw-pub"></i> Flagged by HR and evidence-positive</span>
         <span><i class="swatch sw-obs"></i> Evidence-positive, never flagged</span>
@@ -525,7 +767,7 @@ td .flag {
           </div>
         </div>
       </div>
-      <p class="footnote"><b>395 unflagged departures of high-potential or high-performing staff — $56.0M of cost scoped out of the business case.</b> Their stated reasons are not a pay story: 224 left for career advancement and 98 for a better opportunity. Compensation accounts for 18.</p>
+      <p class="footnote"><b>395 unflagged departures of high-potential or high-performing staff, $56.0M of cost scoped out of the business case.</b> Their stated reasons are not a pay story: 224 left for career advancement and 98 for a better opportunity. Compensation accounts for 18.</p>
     </div>
   </div>
 
@@ -534,22 +776,22 @@ td .flag {
   <div class="grid two">
     <div class="card">
       <h3>No department to blame</h3>
-      <p class="sub">Replacement cost of voluntary exits, by department. The top three carry 61.7% between them — broadly in line with their share of headcount.</p>
+      <p class="sub">Replacement cost of voluntary exits, by department. The top three carry 61.7% between them, broadly in line with their share of headcount.</p>
       <div class="bars">
-        <div class="bar-row"><div class="bar-name">Retail Banking</div><div class="bar-line"><div class="bar-fill solo" style="width:100%"></div><span class="bar-val"><b>$39.8M</b> · 22.1%</span></div></div>
-        <div class="bar-row"><div class="bar-name">Technology</div><div class="bar-line"><div class="bar-fill solo" style="width:97.7%"></div><span class="bar-val"><b>$38.9M</b> · 21.6%</span></div></div>
-        <div class="bar-row"><div class="bar-name">Risk &amp; Compliance</div><div class="bar-line"><div class="bar-fill solo" style="width:81.9%"></div><span class="bar-val"><b>$32.6M</b> · 18.0%</span></div></div>
-        <div class="bar-row"><div class="bar-name">Corporate Operations</div><div class="bar-line"><div class="bar-fill solo" style="width:59.0%"></div><span class="bar-val"><b>$23.5M</b> · 13.0%</span></div></div>
-        <div class="bar-row"><div class="bar-name">Insurance</div><div class="bar-line"><div class="bar-fill solo" style="width:56.8%"></div><span class="bar-val"><b>$22.6M</b> · 12.5%</span></div></div>
-        <div class="bar-row"><div class="bar-name">Wealth Management</div><div class="bar-line"><div class="bar-fill solo" style="width:51.0%"></div><span class="bar-val"><b>$20.3M</b> · 11.2%</span></div></div>
-        <div class="bar-row"><div class="bar-name">Executive Leadership</div><div class="bar-line"><div class="bar-fill solo" style="width:6.8%"></div><span class="bar-val"><b>$2.7M</b> · 1.5%</span></div></div>
+        <div class="bar-row"><div class="bar-name">Retail Banking</div><div class="bar-line"><div class="bar-fill solo" style="width:100%"></div><span class="bar-val"><b>$19.9M</b> · 22.1%</span></div></div>
+        <div class="bar-row"><div class="bar-name">Technology</div><div class="bar-line"><div class="bar-fill solo" style="width:97.7%"></div><span class="bar-val"><b>$19.5M</b> · 21.6%</span></div></div>
+        <div class="bar-row"><div class="bar-name">Risk &amp; Compliance</div><div class="bar-line"><div class="bar-fill solo" style="width:81.9%"></div><span class="bar-val"><b>$16.3M</b> · 18.0%</span></div></div>
+        <div class="bar-row"><div class="bar-name">Corporate Operations</div><div class="bar-line"><div class="bar-fill solo" style="width:59.0%"></div><span class="bar-val"><b>$11.8M</b> · 13.0%</span></div></div>
+        <div class="bar-row"><div class="bar-name">Insurance</div><div class="bar-line"><div class="bar-fill solo" style="width:56.8%"></div><span class="bar-val"><b>$11.3M</b> · 12.5%</span></div></div>
+        <div class="bar-row"><div class="bar-name">Wealth Management</div><div class="bar-line"><div class="bar-fill solo" style="width:51.0%"></div><span class="bar-val"><b>$10.2M</b> · 11.2%</span></div></div>
+        <div class="bar-row"><div class="bar-name">Executive Leadership</div><div class="bar-line"><div class="bar-fill solo" style="width:6.8%"></div><span class="bar-val"><b>$1.4M</b> · 1.5%</span></div></div>
       </div>
       <p class="footnote"><b>Do not build a department-targeted programme off this.</b> Cost follows headcount. The one cut that does discriminate is exit <i>quality</i>: Corporate Operations 17.1%, Risk &amp; Compliance 16.9% and Insurance 16.8% of exits are flagged regrettable, against 9.1% in Retail Banking.</p>
     </div>
 
     <div class="card">
       <h3>Does the answer survive the judgement call?</h3>
-      <p class="sub">"Persistently disengaged" needs a score threshold and a minimum number of low waves. Neither comes from the brief. Disengagement cost ($M) across the full grid of both:</p>
+      <p class="sub">"Persistently disengaged" needs a score threshold and a minimum number of low waves. Neither is specified in Finance's model, so both are ours. Disengagement cost ($M) across the full grid of both:</p>
       <div class="table-wrap">
         <table>
           <caption class="sr-only">Disengagement cost in $M by score cut-off and minimum low waves</caption>
@@ -557,21 +799,135 @@ td .flag {
             <tr><th>Score cut-off</th><th>≥1 low wave</th><th>≥2 low waves</th><th>≥3 low waves</th></tr>
           </thead>
           <tbody>
-            <tr><td>&lt; 2.50</td><td>$28.1M</td><td>$17.1M</td><td>$10.9M</td></tr>
-            <tr><td>&lt; 2.75</td><td>$52.8M</td><td>$34.2M</td><td>$23.2M</td></tr>
-            <tr class="is-highlight"><td>&lt; 3.00 <span class="flag">used</span></td><td>$87.7M</td><td>$61.8M</td><td>$44.3M</td></tr>
-            <tr><td>&lt; 3.25</td><td>$126.8M</td><td>$95.4M</td><td>$71.8M</td></tr>
-            <tr><td>&lt; 3.50</td><td>$165.3M</td><td>$131.2M</td><td>$104.0M</td></tr>
+            <tr><td>&lt; 2.50</td><td class="heat" style="--v:0.17"><span>$28.1M</span></td><td class="heat" style="--v:0.10"><span>$17.1M</span></td><td class="heat" style="--v:0.07"><span>$10.9M</span></td></tr>
+            <tr><td>&lt; 2.75</td><td class="heat" style="--v:0.32"><span>$52.8M</span></td><td class="heat" style="--v:0.21"><span>$34.2M</span></td><td class="heat" style="--v:0.14"><span>$23.2M</span></td></tr>
+            <tr class="is-highlight"><td>&lt; 3.00 <span class="flag">used</span></td><td class="heat" style="--v:0.53"><span>$87.7M</span></td><td class="heat" style="--v:0.37"><span>$61.8M</span></td><td class="heat" style="--v:0.27"><span>$44.3M</span></td></tr>
+            <tr><td>&lt; 3.25</td><td class="heat" style="--v:0.77"><span>$126.8M</span></td><td class="heat" style="--v:0.58"><span>$95.4M</span></td><td class="heat" style="--v:0.43"><span>$71.8M</span></td></tr>
+            <tr><td>&lt; 3.50</td><td class="heat" style="--v:1.00"><span>$165.3M</span></td><td class="heat" style="--v:0.79"><span>$131.2M</span></td><td class="heat" style="--v:0.63"><span>$104.0M</span></td></tr>
           </tbody>
         </table>
       </div>
-      <p class="footnote"><b>The conclusion survives every cell but the strictest.</b> Only the harshest definition — two-and-a-half out of five, sustained across three separate waves — brings disengagement below Finance's published $12–15M. Everywhere else the published range is too low, most of the time by a multiple.</p>
+      <p class="footnote"><b>The conclusion survives every cell but the strictest.</b> Only the harshest definition, two-and-a-half out of five, sustained across three separate waves, brings disengagement below Finance's published $12–15M. Everywhere else the published range is too low, most of the time by a multiple.</p>
     </div>
   </div>
 
-  <div class="section-rule"><h3>What to defend, and what to concede</h3></div>
-  <p class="callout"><b>Defend:</b> $143.7M is Finance's arithmetic, not ours. Every constant is theirs. Concede the range before someone asks for it — the disengagement component moves between $10.9M and $165.3M on the threshold alone.</p>
-  <p class="callout is-warn"><b>Concede:</b> the log covers 60% of the FY2025 departures the annual report reports. That understates the regrettable-attrition component specifically, which is the one component that currently reconciles. Resolve the reconciliation before the number is quoted externally.</p>
+
+
+  <div class="section-rule"><h3>The rate on page 8</h3></div>
+
+  <div class="grid two">
+    <div class="card">
+      <h3>The published 10.4% is reproducible, and reproducing it is the finding</h3>
+      <p class="sub">The FY2025 report gives voluntary attrition of 10.4% and a
+        departmental breakdown. Both come out of this dataset exactly, using one
+        formula, and the formula is not the one the label describes.</p>
+
+      <div class="ledger">
+        <div><span class="lbl">Full historical roster</span><span class="val">13,403</span></div>
+        <div><span class="lbl">Still active</span><span class="val">12,003</span></div>
+        <div><span class="lbl">Difference, all departures over 24 months</span><span class="val">1,400</span></div>
+        <div><span class="lbl">1,400 ÷ 13,403</span><span class="val">10.4%</span></div>
+      </div>
+
+      <p class="footnote"><b>All seven departments reconcile to the decimal on the
+        same formula.</b> Retail Banking 9.3%, Technology 10.4%, Risk &amp;
+        Compliance 11.8%, Insurance 10.3%, Wealth Management 10.5%, Corporate
+        Operations 11.6%, Executive Leadership 8.3%. There is no ambiguity about
+        what was computed.</p>
+    </div>
+
+    <div class="card">
+      <h3>Three things the label gets wrong</h3>
+      <p class="sub">Each is independent of the others, and all three push the
+        published figure in the same direction.</p>
+
+      <div class="bars">
+        <div class="bar-row">
+          <div class="bar-name">Not voluntary<small>267 of the 1,400 are involuntary exits</small></div>
+          <div class="bar-line"><div class="bar-fill mute" style="width:19%"></div><span class="bar-val">19% of the count</span></div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-name">Not annual<small>the window is 24 months, not 12</small></div>
+          <div class="bar-line"><div class="bar-fill obs" style="width:100%"></div><span class="bar-val"><b>2×</b> overstatement</span></div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-name">Not headcount<small>denominator includes everyone who left</small></div>
+          <div class="bar-line"><div class="bar-fill mute" style="width:12%"></div><span class="bar-val">13,403 vs 12,003</span></div>
+        </div>
+      </div>
+
+      <p class="footnote"><b>Corrected, annual voluntary attrition is 4.7%.</b>
+        1,133 voluntary exits over two years, against 12,003 active employees.
+        Depending on which twelve months are chosen it runs between 4.6% and
+        5.7%. Against AHRI's 15.2% Australian organisational average and ABS
+        Financial and Insurance Services mobility of 7.9%, NovaCorp is not
+        losing people quickly. It is losing them selectively.</p>
+    </div>
+  </div>
+
+  <p class="callout" style="margin-top:18px"><b>This changes the target, not
+    just the number.</b> FY2026 guidance sets voluntary attrition below 9.5%
+    against a stated 10.4%. On a like-for-like basis the company is already at
+    roughly half that, and has been for both years in the data. The scorecard is
+    measuring a quantity that is not what its name says, which means the
+    programme it governs could succeed or fail without the metric moving.</p>
+
+  <div class="section-rule"><h3>A component that does not survive its own definition</h3></div>
+
+  <div class="card">
+    <h3>Finance calls it hiring inefficiency. Neither half of that is visible.</h3>
+    <p class="sub">Finance defines this component as the cost premium of agency
+      hiring <i>and poor-match early attrition</i>. Both halves are testable.
+      Each channel below shows days to fill, attrition rate, and the share of its
+      exits flagged regrettable, on a shared scale.</p>
+
+    <div class="multiples">
+      <div class="mult is-focus">
+        <div class="mult-name">Agency</div>
+        <div class="mult-row"><div class="mult-bar is-focus" style="width:88%"></div><span class="mult-val">52.5 d</span></div>
+        <div class="mult-row"><div class="mult-bar is-focus" style="width:61%"></div><span class="mult-val">9.8%</span></div>
+        <div class="mult-row"><div class="mult-bar is-focus" style="width:65%"></div><span class="mult-val">10.4%</span></div>
+      </div>
+      <div class="mult">
+        <div class="mult-name">Direct</div>
+        <div class="mult-row"><div class="mult-bar" style="width:86%"></div><span class="mult-val">51.4 d</span></div>
+        <div class="mult-row"><div class="mult-bar" style="width:62%"></div><span class="mult-val">9.9%</span></div>
+        <div class="mult-row"><div class="mult-bar" style="width:75%"></div><span class="mult-val">12.0%</span></div>
+      </div>
+      <div class="mult">
+        <div class="mult-name">Referral</div>
+        <div class="mult-row"><div class="mult-bar" style="width:87%"></div><span class="mult-val">52.1 d</span></div>
+        <div class="mult-row"><div class="mult-bar" style="width:61%"></div><span class="mult-val">9.7%</span></div>
+        <div class="mult-row"><div class="mult-bar" style="width:76%"></div><span class="mult-val">12.2%</span></div>
+      </div>
+      <div class="mult">
+        <div class="mult-name">Acquisition</div>
+        <div class="mult-row"><div class="mult-bar" style="width:86%"></div><span class="mult-val">51.8 d</span></div>
+        <div class="mult-row"><div class="mult-bar" style="width:68%"></div><span class="mult-val">10.9%</span></div>
+        <div class="mult-row"><div class="mult-bar" style="width:66%"></div><span class="mult-val">10.5%</span></div>
+      </div>
+      <div class="mult">
+        <div class="mult-name">Graduate</div>
+        <div class="mult-row"><div class="mult-bar" style="width:86%"></div><span class="mult-val">51.3 d</span></div>
+        <div class="mult-row"><div class="mult-bar" style="width:86%"></div><span class="mult-val">13.8%</span></div>
+        <div class="mult-row"><div class="mult-bar" style="width:66%"></div><span class="mult-val">10.6%</span></div>
+      </div>
+    </div>
+
+    <p class="footnote"><b>Agency is mid-pack or better on every dimension.</b>
+      It fills roles 1.2 days slower than the fastest channel, leaves at a rate
+      inside the range set by the other four, and its exits are <i>less</i>
+      likely to be flagged regrettable than those of direct hires. The $2.4M is
+      an agency spend figure, not an inefficiency figure. The 18% fee is also
+      Finance's assumption: no cost, fee or cost-per-hire column exists in any of
+      the four files, so nothing in this component is data-derived except the
+      headcount. The label is kept because it is Finance's own taxonomy; the
+      claim behind it is marked unevidenced.</p>
+  </div>
+
+  <div class="section-rule"><h3>What this rests on</h3></div>
+  <p class="callout"><b>What this rests on:</b> $76.7M is Finance's arithmetic. Every constant is theirs; only the observation window is ours, and it is stated. The range matters as much as the point: disengagement moves between $10.9M and $165.3M on the threshold alone, and it is the component carrying the whole gap.</p>
+  <p class="callout is-warn"><b>What it does not rest on:</b> the log covers 60% of the FY2025 departures the annual report reports, and the regrettable component is the one that gap hits. At 0.5x Finance's range it is already the weakest of the three, and correcting the log would move it toward them rather than away. Resolve the reconciliation before the number is quoted externally.</p>
 </section>
 
 <!-- ══════════════════════════════════ A2 ══════════════════════════════════ -->
@@ -579,17 +935,19 @@ td .flag {
 
   <div class="verdict">
     <div class="eyebrow">Workpaper A2 · the FAR natural experiment</div>
-    <span class="stamp is-none">Not identified — this is not the same as "no effect"</span>
+    <span class="stamp is-none">Not identified, this is not the same as "no effect"</span>
     <h2>FAR did not push regulated staff out. Nor can this data show that it did.</h2>
-    <p>The Financial Accountability Regime commenced for banking on <strong>15 March 2024</strong> and for insurance and superannuation on <strong>15 March 2025</strong>. That twelve-month stagger is the closest thing to a randomised trial a people dataset ever offers, and it is the right instinct to reach for it.</p>
-    <p>It does not survive contact with the observation window. The data begins in January 2024 — <strong>six weeks</strong> before the first wave commenced. The obvious before/after comparison returns a 9× jump that is purely an artefact of measuring 1.4 months against nine. Run the design properly and the estimate is <strong>+1.4 exits per 1,000, against a standard error of 14.2</strong>.</p>
+    <div class="verdict-body">
+      <p>The Financial Accountability Regime commenced for banking on <strong>15 March 2024</strong> and for insurance and superannuation on <strong>15 March 2025</strong>. That twelve-month stagger is the closest thing to a randomised trial a people dataset ever offers, and it is the right instinct to reach for it.</p>
+    <p>It does not survive contact with the observation window. The data begins in January 2024, <strong>six weeks</strong> before the first wave commenced. The obvious before/after comparison returns a 9× jump that is purely an artefact of measuring 1.4 months against nine. Run the design properly and the estimate is <strong>+1.4 exits per 1,000, against a standard error of 14.2</strong>.</p>
+    </div>
   </div>
 
   <div class="kpis">
     <div class="kpi">
       <div class="kpi-label">Naive Wave 1 before/after</div>
       <div class="kpi-value counter">9.0×</div>
-      <div class="kpi-note">artefact — 1.4 months of pre-period</div>
+      <div class="kpi-note">artefact, 1.4 months of pre-period</div>
     </div>
     <div class="kpi">
       <div class="kpi-label">Correctly identified effect</div>
@@ -619,7 +977,7 @@ td .flag {
         <line class="grid-line" x1="500" y1="34" x2="500" y2="196"></line>
         <line class="grid-line" x1="640" y1="34" x2="640" y2="196"></line>
         <line class="zero-line" x1="360" y1="28" x2="360" y2="202"></line>
-        <text class="axis-text" x="360" y="220" text-anchor="middle">0 — no effect</text>
+        <text class="axis-text" x="360" y="220" text-anchor="middle">0, no effect</text>
         <text class="axis-text" x="80"  y="220" text-anchor="middle">−30</text>
         <text class="axis-text" x="220" y="220" text-anchor="middle">−15</text>
         <text class="axis-text" x="500" y="220" text-anchor="middle">+15</text>
@@ -651,7 +1009,7 @@ td .flag {
         <text class="mark-label" x="424" y="188" style="fill:var(--ink-3)">+5.6</text>
       </g>
     </svg>
-    <p class="footnote"><b>Zero sits comfortably inside the only interval this data supports.</b> The two within-wave estimates disagree in sign, which is not a contradiction — both are noise around nothing. 476 regulated employees producing 39 exits cannot resolve an effect of any plausible size.</p>
+    <p class="footnote"><b>Zero sits comfortably inside the only interval this data supports.</b> The two within-wave estimates disagree in sign, which is not a contradiction, both are noise around nothing. 476 regulated employees producing 39 exits cannot resolve an effect of any plausible size.</p>
   </div>
 
   <div class="grid two" style="margin-top:18px">
@@ -676,20 +1034,130 @@ td .flag {
         <text class="axis-text" x="0" y="20">before</text>
         <text class="axis-text" x="620" y="20" text-anchor="end">after</text>
       </svg>
-      <p class="footnote"><b>The orange block is the entire Wave 1 pre-period.</b> A ratio computed against six weeks measures the length of the window, not the effect of the regulation. Lead the presentation with this — producing the 9× and then dismantling it is a stronger opening than any finding on the screen.</p>
+      <p class="footnote"><b>The orange block is the entire Wave 1 pre-period.</b> A ratio computed against six weeks measures the length of the window, not the effect of the regulation. The 9× is the number an ordinary before/after analysis returns, and it is the reason this component needed rebuilding rather than reporting.</p>
     </div>
 
     <div class="card">
       <h3>Three reasons not to spend on this</h3>
       <p class="sub">Each is independently sufficient to stop a FAR-attributed retention programme from being funded.</p>
       <p class="callout is-crit"><b>A competing explanation fits better.</b> The Entity_B and Entity_C acquisitions run through the same window. Among regulated staff, Entity_B leaves at <b>17.1%</b> against Entity_A's <b>8.0%</b>. Integration is at least as plausible as regulation, and it is actionable.</p>
-      <p class="callout is-warn"><b>The population where the effect should be strongest is unmeasurable.</b> FAR attaches to accountable persons, so the effect should concentrate in senior regulated roles — of which there are 22 in Wave 1 and 6 in Wave 2. One departure moves the rate by five points.</p>
+      <p class="callout is-warn"><b>The population where the effect should be strongest is unmeasurable.</b> FAR attaches to accountable persons, so the effect should concentrate in senior regulated roles, of which there are 22 in Wave 1 and 6 in Wave 2. One departure moves the rate by five points.</p>
       <p class="callout"><b>230 of the most exposed people are missing from the cut entirely.</b> <code>Executive Leadership</code> maps to no wave, because it spans both regulated arms. They are reported separately rather than dropped, but no wave-level statistic includes them.</p>
     </div>
   </div>
 
+
+  <div class="section-rule"><h3>The integration curve</h3></div>
+
+  <div class="card">
+    <h3>Entity_C is tracking Entity_B, not Entity_A</h3>
+    <p class="sub">Share of each acquisition cohort that had left by month H,
+      counting only employees observed at least that long. Cohorts joined in
+      different years, so a raw comparison would measure exposure rather than
+      attrition. Lines stop where a cohort runs out of observation.</p>
+
+    <svg class="chart" viewBox="0 0 660 268" role="img"
+      aria-label="Integration attrition by cohort. At six months Entity_A had lost 0.1 percent, Entity_B 8.3 percent and Entity_C 9.1 percent. Entity_C is following Entity_B's path.">
+      <g>
+        <line class="grid-line" x1="70" y1="214" x2="620" y2="214"></line>
+        <line class="grid-line" x1="70" y1="169" x2="620" y2="169"></line>
+        <line class="grid-line" x1="70" y1="124" x2="620" y2="124"></line>
+        <line class="grid-line" x1="70" y1="79" x2="620" y2="79"></line>
+        <line class="grid-line" x1="70" y1="34" x2="620" y2="34"></line>
+        <text class="axis-text" x="60" y="218" text-anchor="end">0%</text>
+        <text class="axis-text" x="60" y="173" text-anchor="end">4%</text>
+        <text class="axis-text" x="60" y="128" text-anchor="end">8%</text>
+        <text class="axis-text" x="60" y="83" text-anchor="end">12%</text>
+        <text class="axis-text" x="60" y="38" text-anchor="end">16%</text>
+      </g>
+
+      <!-- six month marker: the only horizon every cohort supports -->
+      <line x1="146" y1="28" x2="146" y2="220"
+            stroke="var(--ink-3)" stroke-width="1" stroke-dasharray="3 3"></line>
+      <text class="axis-text" x="152" y="30">like-for-like horizon</text>
+
+      <polyline fill="none" stroke="var(--ink-3)" stroke-width="1.6"
+                stroke-dasharray="4 3" points="70,212 146,212 221,212 297,212 449,211 600,211"></polyline>
+      <polyline fill="none" stroke="var(--accent)" stroke-width="2.4"
+                points="70,214 146,213 221,208 297,195 449,167 600,144"></polyline>
+      <polyline fill="none" stroke="var(--counter)" stroke-width="2.4"
+                points="70,146 146,121 221,99 297,76 449,40"></polyline>
+      <polyline fill="none" stroke="var(--stop)" stroke-width="3"
+                points="70,123 146,112"></polyline>
+
+      <g fill="var(--accent)"><circle cx="70" cy="214" r="3.5"></circle><circle cx="146" cy="213" r="3.5"></circle><circle cx="221" cy="208" r="3.5"></circle><circle cx="297" cy="195" r="3.5"></circle><circle cx="449" cy="167" r="3.5"></circle><circle cx="600" cy="144" r="3.5"></circle></g>
+      <g fill="var(--counter)"><circle cx="70" cy="146" r="3.5"></circle><circle cx="146" cy="121" r="3.5"></circle><circle cx="221" cy="99" r="3.5"></circle><circle cx="297" cy="76" r="3.5"></circle><circle cx="449" cy="40" r="3.5"></circle></g>
+      <g fill="var(--stop)"><circle cx="70" cy="123" r="4.5"></circle><circle cx="146" cy="112" r="4.5"></circle></g>
+
+      <text class="series-label" x="457" y="171" fill="var(--accent)">Entity_A · 2023</text>
+      <text class="series-label" x="457" y="44" fill="var(--counter)">Entity_B · 2024</text>
+      <text class="series-label" x="156" y="104" fill="var(--stop)">Entity_C · 2025</text>
+      <text class="axis-text" x="297" y="205" fill="var(--ink-3)">NovaCorp-Origin</text>
+
+      <g>
+        <text class="axis-text" x="70" y="234" text-anchor="middle">3</text>
+        <text class="axis-text" x="146" y="234" text-anchor="middle">6</text>
+        <text class="axis-text" x="221" y="234" text-anchor="middle">9</text>
+        <text class="axis-text" x="297" y="234" text-anchor="middle">12</text>
+        <text class="axis-text" x="449" y="234" text-anchor="middle">18</text>
+        <text class="axis-text" x="600" y="234" text-anchor="middle">24</text>
+        <text class="axis-text" x="345" y="256" text-anchor="middle"
+              style="fill:var(--ink-3)">months since joining NovaCorp</text>
+      </g>
+    </svg>
+
+    <p class="footnote"><b>At six months: Entity_A 0.1%, Entity_B 8.3%,
+      Entity_C 9.1%.</b> One departure in 1,950 people against 156 in 1,884 and
+      92 in 1,014. Entity_A's integration was not merely better, it was almost
+      flawless for two quarters, and whatever produced that was not repeated.
+      Entity_C is about eight months in and still inside its risk window.</p>
+  </div>
+
+  <div class="grid two" style="margin-top:18px">
+    <div class="card">
+      <h3>What the curve implies for the 1,014 people in Entity_C</h3>
+      <p class="sub">Projecting the cohort forward along each of the two paths
+        already observed inside this company, at Finance's own replacement cost.</p>
+      <div class="bars">
+        <div class="bar-row">
+          <div class="bar-name">Departed already<small>month 6, observed</small></div>
+          <div class="bar-line"><div class="bar-fill mute" style="width:58.6%"></div><span class="bar-val"><b>92</b> people</span></div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-name">If it follows Entity_A<small>4.2% by month 18</small></div>
+          <div class="bar-line"><div class="bar-fill solo" style="width:27.4%"></div><span class="bar-val"><b>43</b> total · $7.0M</span></div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-name">If it follows Entity_B<small>15.5% by month 18</small></div>
+          <div class="bar-line"><div class="bar-fill obs" style="width:100%"></div><span class="bar-val"><b>157</b> total · $25.6M</span></div>
+        </div>
+      </div>
+      <p class="footnote"><b>$18.6M sits between the two paths.</b> This is the
+        only forward-looking number in the analysis: every other finding
+        describes something that has already happened. It concerns a named
+        cohort with a date attached, and the window has not closed.</p>
+    </div>
+
+    <div class="card">
+      <h3>What it is and is not</h3>
+      <p class="sub">The comparison is corrected for exposure. It is not a
+        controlled design, and the limits of that are set out below.</p>
+      <p class="callout"><b>It is like-for-like.</b> Each cohort is measured at
+        the same horizon, counting only people observed that long. This is the
+        same correction the FAR event study needed, and without it Entity_C
+        looks catastrophic purely because it is new.</p>
+      <p class="callout is-warn"><b>It is association, not proof.</b> The three
+        cohorts differ in size, sector mix and integration year. Nothing here
+        isolates a cause, and Entity_C has only two points on the curve.</p>
+      <p class="callout"><b>It is still the most actionable thing here.</b>
+        Unlike the FAR hypothesis, which is unidentifiable in either direction,
+        this is a live risk on 1,014 identified people. The outcome can still be changed, which is what
+        separates it from everything else on these four screens.</p>
+    </div>
+  </div>
+
   <div class="section-rule"><h3>The distinction that matters</h3></div>
-  <p class="callout is-crit"><b>"Not identified" is not "no effect."</b> The interval runs from −26.4 to +29.2 per 1,000. A real and material FAR exodus is inside that interval; so is a real and material retention effect. The correct statement to a board is that this dataset cannot distinguish them — and that a claim in either direction is unsupported, including the one everyone expected to find.</p>
+  <p class="callout is-crit"><b>"Not identified" is not "no effect."</b> The interval runs from −26.4 to +29.2 per 1,000. A real and material FAR exodus is inside that interval; so is a real and material retention effect. The correct statement to a board is that this dataset cannot distinguish them, and that a claim in either direction is unsupported, including the one everyone expected to find.</p>
 </section>
 
 <!-- ══════════════════════════════════ A3 ══════════════════════════════════ -->
@@ -697,10 +1165,12 @@ td .flag {
 
   <div class="verdict">
     <div class="eyebrow">Workpaper A3 · non-response as a leading indicator</div>
-    <span class="stamp is-solid">Identified — corrected for exposure, holds</span>
+    <span class="stamp is-solid">Identified, corrected for exposure, holds</span>
     <h2>The people who stop answering are the ones who leave.</h2>
-    <p>An employee who answered the engagement survey and then goes quiet for two consecutive waves leaves at <strong>2.2× the rate</strong> of their peers. The signal HR watches today — a low engagement score — carries a lift of <strong>1.07×</strong>. Silence is roughly twice as predictive as the thing currently being monitored, and it is free.</p>
+    <div class="verdict-body">
+      <p>An employee who answered the engagement survey and then goes quiet for two consecutive waves leaves at <strong>2.2× the rate</strong> of their peers. The signal HR watches today, a low engagement score, carries a lift of <strong>1.07×</strong>. Silence is roughly twice as predictive as the thing currently being monitored, and it is free.</p>
     <p>It also arrives sooner and reaches further. A score-based alert needs a processed survey cycle and can only fire for somebody who answered. Non-response is known <strong>the day the wave closes</strong>, and it fires precisely on the population that has no score at all.</p>
+    </div>
   </div>
 
   <div class="kpis">
@@ -748,7 +1218,7 @@ td .flag {
           <div class="bar-line"><div class="bar-fill mute" style="width:100%"></div><span class="bar-val"><b>4.87×</b> · 28.6%</span></div>
         </div>
       </div>
-      <p class="footnote"><b>The 4.87× is real but thin</b> — 63 people, once exposure is properly controlled. Build the alert on <i>went silent</i>, which carries a defensible sample and the operational advantage: it fires the day the wave closes, with no scoring cycle in between.</p>
+      <p class="footnote"><b>The 4.87× is real but thin</b>, 63 people, once exposure is properly controlled. Build the alert on <i>went silent</i>, which carries a defensible sample and the operational advantage: it fires the day the wave closes, with no scoring cycle in between.</p>
     </div>
 
     <div class="card">
@@ -792,7 +1262,67 @@ td .flag {
           <text class="axis-text" x="314" y="234" text-anchor="middle" style="fill:var(--ink-3)">months before exit</text>
         </g>
       </svg>
-      <p class="footnote"><b>There is no late collapse, and that is the finding.</b> A gap that opens 18 months out and holds flat means the mechanism is disengagement, not notice-period checkout — and it means the intervention window is measured in quarters, not weeks.</p>
+      <p class="footnote"><b>There is no late collapse, and that is the finding.</b> A gap that opens 18 months out and holds flat means the mechanism is disengagement, not notice-period checkout, and it means the intervention window is measured in quarters, not weeks.</p>
+    </div>
+  </div>
+
+
+  <div class="section-rule"><h3>What sits underneath the silence</h3></div>
+
+  <div class="card">
+    <h3>Manager effectiveness is the strongest signal in the survey, by a distance</h3>
+    <p class="sub">Persistent disengagement, meaning a composite score below 3.0
+      in two or more answered waves, plotted against the employee's mean rating
+      of their manager. The gradient is monotonic across all five bands.</p>
+
+    <div class="bars">
+        <div class="bar-row">
+          <div class="bar-name">Manager rated 4.0+<small>n = 2,874</small></div>
+          <div class="bar-line"><div class="bar-fill solo" style="width:7%"></div><span class="bar-val"><b>4.5%</b> persistently disengaged</span></div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-name">Manager rated 3.5-4.0<small>n = 2,235</small></div>
+          <div class="bar-line"><div class="bar-fill solo" style="width:21%"></div><span class="bar-val"><b>14.7%</b> persistently disengaged</span></div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-name">Manager rated 3.0-3.5<small>n = 2,256</small></div>
+          <div class="bar-line"><div class="bar-fill mute" style="width:39%"></div><span class="bar-val"><b>27.0%</b> persistently disengaged</span></div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-name">Manager rated 2.5-3.0<small>n = 1,912</small></div>
+          <div class="bar-line"><div class="bar-fill obs" style="width:65%"></div><span class="bar-val"><b>45.0%</b> persistently disengaged</span></div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-name">Manager rated <2.5<small>n = 1,880</small></div>
+          <div class="bar-line"><div class="bar-fill obs" style="width:100%"></div><span class="bar-val"><b>68.8%</b> persistently disengaged</span></div>
+        </div>
+    </div>
+
+    <p class="footnote"><b>15.5× between the ends of the scale</b>, on 11,157
+      employees with at least two answered waves. This is not a threshold
+      artefact: disengagement falls at every step of the gradient, not only at
+      the extremes.</p>
+  </div>
+
+  <div class="claim-pair" style="margin-top:18px">
+    <div class="claim is-yes">
+      <div class="claim-tag">What the evidence supports</div>
+      <p><b>Employees who rate their manager poorly are far more likely to be
+        persistently disengaged.</b> The association is large, monotonic and
+        highly significant on a sample of 11,157.</p>
+      <p>It is also the most controllable thing on these four screens. Manager
+        capability is something NovaCorp already develops, and the next survey
+        wave measures it directly.</p>
+    </div>
+    <div class="claim is-no">
+      <div class="claim-tag">What it does not support</div>
+      <p><b>It does not show that poor managers cause people to leave.</b>
+        Manager rating correlates with attrition at r = -0.012 (p = 0.22), which
+        is indistinguishable from zero. Disengagement itself correlates with
+        attrition at r = -0.002.</p>
+      <p>So the case for acting is a productivity and working-conditions case,
+        not a retention case. Presenting it as an attrition programme would be
+        claiming something these data do not show.</p>
     </div>
   </div>
 
@@ -814,12 +1344,12 @@ td .flag {
         </tbody>
       </table>
     </div>
-    <p class="footnote"><b>Entity_C's 31.4% non-response sits with the second-lowest attrition in the company.</b> The apparent signal tracked how many surveys people were sent, not how they felt. Conditioning on three or more waves issued — 11,518 employees, 85.9% of the company — removes the artefact and leaves a 2.16× lift that holds.</p>
+    <p class="footnote"><b>Entity_C's 31.4% non-response sits with the second-lowest attrition in the company.</b> The apparent signal tracked how many surveys people were sent, not how they felt. Conditioning on three or more waves issued, 11,518 employees, 85.9% of the company, removes the artefact and leaves a 2.16× lift that holds.</p>
   </div>
 
   <div class="section-rule"><h3>What this cannot tell you</h3></div>
-  <p class="callout is-warn"><b>New starters are outside the estimate.</b> Requiring three waves of exposure removes almost everyone hired in the last year — and that is the population with both the highest non-response and the highest attrition. The 2.16× is clean within a long-tenured population and silent about the group a CHRO most wants to watch. A person-wave hazard model recovers them, and is the first thing to build next.</p>
-  <p class="callout"><b>It is not a proxy for something already known.</b> Silence does not track attrition across tenure bands or legacy entities — Entity_B has the highest silence rate at 10.5% and the <i>lowest</i> attrition at 4.4% within this population — yet it predicts at the individual level. That is what makes it worth deploying rather than absorbing into an existing segment cut.</p>
+  <p class="callout is-warn"><b>New starters are outside the estimate.</b> Requiring three waves of exposure removes almost everyone hired in the last year, and that is the population with both the highest non-response and the highest attrition. The 2.16× is clean within a long-tenured population and silent about the group a CHRO most wants to watch. A person-wave hazard model recovers them, and is the first thing to build next.</p>
+  <p class="callout"><b>It is not a proxy for something already known.</b> Silence does not track attrition across tenure bands or legacy entities, Entity_B has the highest silence rate at 10.5% and the <i>lowest</i> attrition at 4.4% within this population, yet it predicts at the individual level. That is what makes it worth deploying rather than absorbing into an existing segment cut.</p>
 </section>
 
 <!-- ══════════════════════════════════ REC ══════════════════════════════════ -->
@@ -828,15 +1358,17 @@ td .flag {
   <div class="verdict">
     <div class="eyebrow">Recommendations · for the CHRO</div>
     <h2>One number to restate, one definition to replace, one alert to ship.</h2>
-    <p>Across three angles the same shape recurs: the measurement is wrong before the intervention is. The cost baseline is scoped too narrowly, the regrettable definition catches a fifth of what it should, and the most predictive signal in the engagement platform is the one nobody is reading. The regulatory story — the one everybody expected to lead with — does not survive the data.</p>
+    <div class="verdict-body">
+      <p>Across three angles the same shape recurs: the measurement is wrong before the intervention is. The cost baseline is scoped too narrowly, the regrettable definition catches a fifth of what it should, and the most predictive signal in the engagement platform is the one nobody is reading. The regulatory story, the one everybody expected to lead with, does not survive the data.</p>
     <p>Ordered by expected value against the confidence the evidence actually supports.</p>
+    </div>
   </div>
 
   <div class="kpis">
     <div class="kpi">
       <div class="kpi-label">Restated cost baseline</div>
-      <div class="kpi-value counter">$143.7M</div>
-      <div class="kpi-note">a floor · published figure $42.0M</div>
+      <div class="kpi-value counter">$76.7M</div>
+      <div class="kpi-note">published figure $42.0M</div>
     </div>
     <div class="kpi">
       <div class="kpi-label">Cost scoped out by HR's definition</div>
@@ -850,7 +1382,7 @@ td .flag {
     </div>
     <div class="kpi">
       <div class="kpi-label">Recommended FAR spend</div>
-      <div class="kpi-value" style="color:var(--crit)">$0</div>
+      <div class="kpi-value" style="color:var(--stop-ink)">$0</div>
       <div class="kpi-note">effect not identified in either direction</div>
     </div>
   </div>
@@ -860,12 +1392,12 @@ td .flag {
   <article class="rec">
     <div>
       <div class="rec-head"><span class="rec-rank">01</span><h4>Ship the non-response alert before the next survey wave closes</h4></div>
-      <p>Flag any employee with two consecutive non-responses after having answered at least once. It runs on data already in the platform, requires no new collection, and fires <b>the day the wave closes</b> — no scoring cycle in between.</p>
-      <p>It is <b>twice as predictive as the low-score signal</b> currently monitored (2.16× against 1.07×) and it reaches the people who have no score at all. Route flagged employees to a manager conversation, not an HR one — the lead time is quarters, so there is room to act.</p>
+      <p>Flag any employee with two consecutive non-responses after having answered at least once. It runs on data already in the platform, requires no new collection, and fires <b>the day the wave closes</b>, no scoring cycle in between.</p>
+      <p>It is <b>twice as predictive as the low-score signal</b> currently monitored (2.16× against 1.07×) and it reaches the people who have no score at all. Route flagged employees to a manager conversation, not an HR one, the lead time is quarters, so there is room to act.</p>
     </div>
     <div class="rec-meta">
       <div class="meta-item"><span class="meta-label">Value</span><span class="meta-value">$1.8M at 20% retention</span></div>
-      <div class="meta-item"><span class="meta-label">Effort</span><span class="meta-value good">Low — one query</span></div>
+      <div class="meta-item"><span class="meta-label">Effort</span><span class="meta-value good">Low, one query</span></div>
       <div class="meta-item"><span class="meta-label">Evidence</span><span class="meta-value good">Identified · A3</span></div>
       <div class="meta-item"><span class="meta-label">Caveat</span><span class="meta-value">Untested on &lt;1yr tenure</span></div>
     </div>
@@ -874,12 +1406,12 @@ td .flag {
   <article class="rec">
     <div>
       <div class="rec-head"><span class="rec-rank">02</span><h4>Replace the regrettable flag with an evidence test</h4></div>
-      <p>HR's retrospective flag captures <b>101 of 496</b> exits that meet an evidence-based definition — a voluntary departure by someone carrying a high-potential flag or a top-two performance rating. Four in five regrettable exits are currently invisible to the business case.</p>
+      <p>HR's retrospective flag captures <b>101 of 496</b> exits that meet an evidence-based definition, a voluntary departure by someone carrying a high-potential flag or a top-two performance rating. Four in five regrettable exits are currently invisible to the business case.</p>
       <p>The 395 missed departures point somewhere specific: <b>224 left for career advancement and 98 for a better opportunity, against 18 citing compensation</b>. That is a progression problem, not a pay problem, and it is the cheapest correction on this page because the data to make it already exists in the performance file.</p>
     </div>
     <div class="rec-meta">
       <div class="meta-item"><span class="meta-label">Value</span><span class="meta-value">$56.0M correctly scoped</span></div>
-      <div class="meta-item"><span class="meta-label">Effort</span><span class="meta-value good">Low — definition change</span></div>
+      <div class="meta-item"><span class="meta-label">Effort</span><span class="meta-value good">Low, definition change</span></div>
       <div class="meta-item"><span class="meta-label">Evidence</span><span class="meta-value good">Directly observed · A1</span></div>
       <div class="meta-item"><span class="meta-label">Caveat</span><span class="meta-value">Evidence test is our call</span></div>
     </div>
@@ -887,13 +1419,13 @@ td .flag {
 
   <article class="rec">
     <div>
-      <div class="rec-head"><span class="rec-rank">03</span><h4>Re-baseline the business case at $143.7M, and label it a floor</h4></div>
-      <p>Applying Finance's own unit costs to the observed population gives <b>$143.7M against the published $42.0M</b>. No constant was changed. The gap is scope: the published figure implies 625–781 disengaged staff against 3,219 in the file, and 228–342 agency hires against 3,243.</p>
+      <div class="rec-head"><span class="rec-rank">03</span><h4>Re-baseline the business case at $76.7M, and move the weight to disengagement</h4></div>
+      <p>Applying Finance's own unit costs to the observed population, on an annual basis, gives <b>$76.7M against the published $42.0M</b>. No constant was changed. The gap is one component: the published figure implies 625–781 disengaged staff against 3,219 in the file. Attrition and agency hiring both come in under Finance's own range.</p>
       <p>Take the range to the board alongside the point estimate. The disengagement component moves between <b>$10.9M and $165.3M</b> depending on where the threshold is set, and stating that first is what makes the headline defensible.</p>
     </div>
     <div class="rec-meta">
       <div class="meta-item"><span class="meta-label">Value</span><span class="meta-value">Correct problem size</span></div>
-      <div class="meta-item"><span class="meta-label">Effort</span><span class="meta-value warn">Medium — CFO alignment</span></div>
+      <div class="meta-item"><span class="meta-label">Effort</span><span class="meta-value warn">Medium, CFO alignment</span></div>
       <div class="meta-item"><span class="meta-label">Evidence</span><span class="meta-value warn">Floor, not estimate · A1</span></div>
       <div class="meta-item"><span class="meta-label">Caveat</span><span class="meta-value">Threshold-sensitive</span></div>
     </div>
@@ -903,11 +1435,11 @@ td .flag {
     <div>
       <div class="rec-head"><span class="rec-rank">04</span><h4>Point the integration lens at Entity_B, not at the regulator</h4></div>
       <p>Among regulated staff, Entity_B leaves at <b>17.1% against Entity_A's 8.0%</b>, and Entity_B carries the highest silence rate of any entity in the comparable population, at 10.5%. The acquisition window overlaps the FAR window exactly, which is why the regulatory story looked plausible.</p>
-      <p>This is the confound from A2 turned into the finding. It is not identified as causal either — but unlike the regulation, it is something the company controls, and it is where the two independent signals agree.</p>
+      <p>This is the confound from A2 turned into the finding. It is not identified as causal either, but unlike the regulation, it is something the company controls, and it is where the two independent signals agree.</p>
     </div>
     <div class="rec-meta">
       <div class="meta-item"><span class="meta-label">Value</span><span class="meta-value">9.1pp attrition gap</span></div>
-      <div class="meta-item"><span class="meta-label">Effort</span><span class="meta-value warn">Medium — diagnostic first</span></div>
+      <div class="meta-item"><span class="meta-label">Effort</span><span class="meta-value warn">Medium, diagnostic first</span></div>
       <div class="meta-item"><span class="meta-label">Evidence</span><span class="meta-value warn">Associational · A2, A3</span></div>
       <div class="meta-item"><span class="meta-label">Caveat</span><span class="meta-value">Not causally identified</span></div>
     </div>
@@ -918,11 +1450,11 @@ td .flag {
       <div class="rec-head"><span class="rec-rank">05</span><h4>Fix three data defects, in this order</h4></div>
       <p><b>The attrition log.</b> 1,400 rows over 24 months against an annual report claiming 1,400 departures in FY2025 alone. Until this reconciles, every cost figure stays a floor and no attrition rate can be quoted externally.</p>
       <p><b>Survey exposure for acquired entities.</b> Entity_C was surveyed once. Any analysis of response behaviour that does not condition on waves issued is out by a factor of two.</p>
-      <p><b>Stale <code>tenure_months</code>.</b> Implied snapshot dates spread over eight months. Survivable for banding, wrong for any model that uses tenure continuously — which is exactly what the hazard model in A3's next step needs.</p>
+      <p><b>Stale <code>tenure_months</code>.</b> Implied snapshot dates spread over eight months. Survivable for banding, wrong for any model that uses tenure continuously, which is exactly what the hazard model in A3's next step needs.</p>
     </div>
     <div class="rec-meta">
       <div class="meta-item"><span class="meta-label">Value</span><span class="meta-value">Unblocks 01 and 03</span></div>
-      <div class="meta-item"><span class="meta-label">Effort</span><span class="meta-value warn">Medium — data owners</span></div>
+      <div class="meta-item"><span class="meta-label">Effort</span><span class="meta-value warn">Medium, data owners</span></div>
       <div class="meta-item"><span class="meta-label">Evidence</span><span class="meta-value good">Verified · DQ</span></div>
       <div class="meta-item"><span class="meta-label">Caveat</span><span class="meta-value">Prerequisite, not a win</span></div>
     </div>
@@ -933,8 +1465,8 @@ td .flag {
   <article class="rec is-dont">
     <div>
       <div class="rec-head"><span class="rec-rank">✕</span><h4>Do not fund a FAR-specific retention programme</h4></div>
-      <p>The correctly identified estimate is <b>+1.4 exits per 1,000 with a standard error of 14.2</b> — a 95% interval running from −26.4 to +29.2. The naive 9× that motivates this spend is an artefact of the dataset starting six weeks before the regulation commenced.</p>
-      <p>State the reason precisely, because it will be challenged: the effect is <b>not identified</b>, which is not the same as showing there is none. 476 regulated employees producing 39 exits cannot resolve an effect of any plausible size in either direction. Revisit when a second post-commencement year is available.</p>
+      <p>The correctly identified estimate is <b>+1.4 exits per 1,000 with a standard error of 14.2</b>, a 95% interval running from −26.4 to +29.2. The naive 9× that motivates this spend is an artefact of the dataset starting six weeks before the regulation commenced.</p>
+      <p>The distinction matters: the effect is <b>not identified</b>, which is not the same as showing there is none. 476 regulated employees producing 39 exits cannot resolve an effect of any plausible size in either direction. Revisit when a second post-commencement year is available.</p>
     </div>
     <div class="rec-meta">
       <div class="meta-item"><span class="meta-label">Recommended spend</span><span class="meta-value crit">$0</span></div>
@@ -943,17 +1475,119 @@ td .flag {
     </div>
   </article>
 
-  <div class="section-rule"><h3>If the board hears one sentence</h3></div>
-  <p class="callout"><b>The $42M is understated roughly threefold on Finance's own arithmetic, the regulatory explanation everyone expected does not survive the data, and the most predictive early-warning signal available is already sitting unused in the engagement platform.</b></p>
 
-  <div class="provenance">
-    <b>Provenance.</b> Every figure on this page is reproducible from the notebooks in this repository.<br>
-    A1 · <b>03_angle1_cost.ipynb</b> — cost bridge, regrettable definitions, threshold sensitivity<br>
-    A2 · <b>04_angle2_far.ipynb</b> — event study, within-wave DiD, staggered design §7<br>
-    A3 · <b>05_angle3_silence.ipynb</b> — exposure correction, signal comparison, lead time<br>
-    DQ · <b>02_data_quality.ipynb</b> — annual report reconciliation, survey exposure, tenure staleness<br>
-    Constants (replacement multiplier 1.5×, backfill 0.85, disengagement 15%, agency fee 18%) are Finance's own, held fixed in <b>src/etl.py</b>.
+
+  <div class="section-rule"><h3>What to start, and when you will know</h3></div>
+
+  <div class="card">
+    <h3>Ordered by when the result becomes observable, not by size</h3>
+    <p class="sub">The bar is the work. The dot is the first point at which the
+      data can tell you whether it worked. Everything here is inside twelve
+      months and inside the CHRO's own authority, except the baseline
+      restatement, which needs the CFO.</p>
+
+    <div class="seq">
+      <div class="seq-head">
+        <span>Intervention</span><span>Work, then first measurable result</span><span>Exposure</span>
+      </div>
+    <div class="seq-row">
+      <div class="seq-name">Manager effectiveness diagnostic<small>CHRO, direct</small></div>
+      <div class="seq-track">
+        <div class="seq-bar" style="left:0.0%;width:25.0%;background:var(--accent)"></div>
+        <div class="seq-dot" style="left:50.0%;background:var(--accent)"></div>
+        <div class="seq-when" style="left:50.0%">Wave 6</div>
+      </div>
+      <div class="seq-val"><b>$61.8M</b>exposure addressed</div>
+    </div>
+    <div class="seq-row">
+      <div class="seq-name">Entity_C integration review<small>CHRO with integration lead</small></div>
+      <div class="seq-track">
+        <div class="seq-bar" style="left:0.0%;width:16.7%;background:var(--stop)"></div>
+        <div class="seq-dot" style="left:33.3%;background:var(--stop)"></div>
+        <div class="seq-when" style="left:33.3%">month 4</div>
+      </div>
+      <div class="seq-val"><b>$18.6M</b>between the two paths</div>
+    </div>
+    <div class="seq-row">
+      <div class="seq-name">Non-response alert<small>CHRO, no new data needed</small></div>
+      <div class="seq-track">
+        <div class="seq-bar" style="left:0.0%;width:8.3%;background:var(--accent)"></div>
+        <div class="seq-dot" style="left:25.0%;background:var(--accent)"></div>
+        <div class="seq-when" style="left:25.0%">next wave</div>
+      </div>
+      <div class="seq-val"><b>$1.8M</b>at 20% retention</div>
+    </div>
+    <div class="seq-row">
+      <div class="seq-name">Regrettable-exit definition<small>CHRO with HR ops</small></div>
+      <div class="seq-track">
+        <div class="seq-bar" style="left:0.0%;width:12.5%;background:var(--accent)"></div>
+        <div class="seq-dot" style="left:75.0%;background:var(--accent)"></div>
+        <div class="seq-when" style="left:75.0%">next exit cycle</div>
+      </div>
+      <div class="seq-val"><b>$56.0M</b>correctly scoped</div>
+    </div>
+    <div class="seq-row">
+      <div class="seq-name">Cost baseline restatement<small>CHRO with CFO</small></div>
+      <div class="seq-track">
+        <div class="seq-bar" style="left:8.3%;width:16.7%;background:var(--flag)"></div>
+        <div class="seq-dot" style="left:25.0%;background:var(--flag)"></div>
+        <div class="seq-when" style="left:25.0%">FY27 planning</div>
+      </div>
+      <div class="seq-val"><b>$76.7M</b>restated from $42M</div>
+    </div>
+    </div>
+
+    <div class="seq-scale">
+      <span></span>
+      <div class="seq-scale-inner">
+        <span style="left:0">now</span>
+        <span style="left:25%">3 months</span>
+        <span style="left:50%">6 months</span>
+        <span style="left:75%">9 months</span>
+        <span style="left:100%">12 months</span>
+      </div>
+      <span></span>
+    </div>
+
+    <p class="footnote"><b>Two of these are time-bound and the rest are not.</b>
+      The Entity_C window closes as that cohort passes its first year, and the
+      non-response alert only fires if it exists before the next wave opens. The
+      other three can start whenever there is capacity. Nothing here requires
+      data NovaCorp does not already hold.</p>
   </div>
+
+  <div class="section-rule"><h3>The blank on page 8</h3></div>
+
+  <div class="card">
+    <h3>Every initiative in the FY2025 report carries a number. One does not.</h3>
+    <p class="sub" style="max-width:none">"Budgets have been put aside to support a programme for People
+      Reinvention" appears three times in the annual report, always without a
+      figure, while $85M in synergies, $320M in technology and $40 to 50M in
+      integration all carry one. This is the allocation that fills it.</p>
+
+    <div class="alloc">
+      <span style="flex:62;background:var(--counter)">Disengagement · $61.8M</span>
+      <span style="flex:19;background:var(--stop)">Entity_C window · $18.6M</span>
+      <span style="flex:12;background:var(--accent)">Regrettable · $12.5M</span>
+      <span style="flex:2;background:var(--ink-3)"></span>
+    </div>
+    <div class="alloc-key">
+      <span><i class="swatch" style="background:var(--counter)"></i> Measured and unaddressed, 4.1× Finance's assumption</span>
+      <span><i class="swatch" style="background:var(--stop)"></i> Forward-looking, window still open</span>
+      <span><i class="swatch" style="background:var(--accent)"></i> Already inside Finance's range</span>
+      <span><i class="swatch" style="background:var(--ink-3)"></i> Agency spend, $2.4M</span>
+    </div>
+
+    <p class="footnote"><b>Read it as a priority order, not a budget request.</b>
+      Two thirds of the addressable cost sits in a population nobody is currently
+      measuring, and the cheapest instrument for finding them already exists in
+      the engagement platform. The Entity_C segment is the only one with a
+      deadline attached.</p>
+  </div>
+
+  <div class="section-rule"><h3>If the board hears one sentence</h3></div>
+  <p class="callout"><b>The $42M is not too small, it is pointed at the wrong component: two thirds of the addressable cost sits with people who have not left and are not being measured. The regulatory explanation everyone expected does not survive the data. And 1,014 people in Entity_C are eight months into the same curve that cost you Entity_B.</b></p>
+
 </section>
 
 </main>
