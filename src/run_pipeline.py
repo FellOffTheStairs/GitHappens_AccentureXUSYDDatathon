@@ -1,5 +1,5 @@
 """
-NovaCorp pipeline runner — rebuilds the parquet cache from the raw data.
+NovaCorp pipeline runner: rebuilds the parquet cache from the raw data.
 
     python src/run_pipeline.py Accenture_Case_Comp_Data.zip
     python src/run_pipeline.py <folder> --outdir clean
@@ -17,7 +17,7 @@ the notebooks read the output either way:
     clean/data_quality.csv            column-level profile
 
 The *analysis* lives in the notebooks. This is here so the cache can be rebuilt
-in one command — from a terminal, a fresh clone, or CI — without opening
+in one command (from a terminal, a fresh clone, or CI) without opening
 Jupyter. If you want the findings, run the notebooks.
 """
 
@@ -92,7 +92,7 @@ def main() -> int:
     print(f"  {'data_quality.csv':<20} {len(dq):>7,} columns profiled")
 
     banner(f"WRITTEN TO {outdir.resolve()}")
-    print("\n  Next: open notebooks/02_data_quality.ipynb — the reconciliation above does not agree with the annual report, and that is the point of interest.")
+    print("\n  Next: open notebooks/02_data_quality.ipynb: the reconciliation above does not agree with the annual report, and that is the point of interest.")
     return 0
 
 
